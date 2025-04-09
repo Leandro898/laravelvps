@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\MercadoPagoOAuthController;
+
 
 
 Route::get('/', function () {
@@ -34,6 +36,17 @@ Route::get('/admin/backup', function () {
 Route::get('/admin/restore', [BackupController::class, 'showRestoreForm']);
 Route::post('/admin/restore', [BackupController::class, 'processRestore']);
 
+// Rutas Oauth Mercado Pago
+Route::middleware(['auth'])->group(function () {
+    Route::get('/oauth/mercado-pago', [MercadoPagoOAuthController::class, 'redirectToMercadoPago'])->name('oauth.redirect');
+    Route::get('/oauth/callback', [MercadoPagoOAuthController::class, 'handleCallback'])->name('oauth.callback');
+});
 
+// Rutas para boton de vinculacion de cuenta
+Route::middleware(['auth'])->group(function () {
+    Route::get('/mercadopago/connect', [MercadoPagoOAuthController::class, 'redirectToMercadoPago'])->name('mercadopago.connect');
+    Route::get('/mercadopago/callback', [MercadoPagoOAuthController::class, 'handleCallback'])->name('mercadopago.callback');
+    Route::post('/mercadopago/disconnect', [MercadoPagoOAuthController::class, 'disconnect'])->name('mercadopago.disconnect');
+});
 
 require __DIR__.'/auth.php';
